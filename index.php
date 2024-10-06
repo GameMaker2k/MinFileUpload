@@ -7,17 +7,26 @@
 @ini_set("display_startup_errors", false);
 @ini_set("docref_ext", "");
 @ini_set("docref_root", "http://php.net/");
-if(!defined("E_DEPRECATED")) { define("E_DEPRECATED", 0); }
+if (!defined("E_DEPRECATED")) {
+    define("E_DEPRECATED", 0);
+}
 @error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED);
 @ini_set("ignore_user_abort", 1);
-@set_time_limit(30); @ignore_user_abort(true);
+@set_time_limit(30);
+@ignore_user_abort(true);
 @ini_set('zend.ze1_compatibility_mode', 0);
-@ini_set("date.timezone","UTC"); 
+@ini_set("date.timezone", "UTC");
 @date_default_timezone_set("UTC");
 @clearstatcache();
-if(!isset($_GET['act'])) { $_GET['act']=null; }
-if(!isset($_GET['filename'])) { $_GET['filename']=null; }
-if($_GET['act']=="delete") { unlink("./uploads/".$_GET['filename']); }
+if (!isset($_GET['act'])) {
+    $_GET['act'] = null;
+}
+if (!isset($_GET['filename'])) {
+    $_GET['filename'] = null;
+}
+if ($_GET['act'] == "delete") {
+    unlink("./uploads/".$_GET['filename']);
+}
 function _format_bytes($a_bytes)
 {
     if ($a_bytes < 1024) {
@@ -60,48 +69,52 @@ function _format_bytes($a_bytes)
 </form>
  
 <?php
-$i=0;
-$max=count($_FILES['file']['error'])-1;
-while($i<=$max) {
-if($_FILES['file']['error'][$i]===0) {
-echo "<hr />";
-echo $_FILES['file']['tmp_name'][$i]." => ".getcwd().DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR.$_FILES['file']['name'][$i]."<br />\n";
-echo "<a href=\"http://".$_SERVER['HTTP_HOST']."/~cooldude2k/minupload/uploads/".$_FILES['file']['name'][$i]."\" title=\"".$_FILES['file']['name'][$i]."\">http://".$_SERVER['HTTP_HOST']."/~cooldude2k/minupload/uploads/".$_FILES['file']['name'][$i]."</a><br />\n";
-echo "\n<pre>";
-var_dump($_FILES['file']['name'][$i]);
-echo "\n";
-var_dump($_FILES['file']['type'][$i]);
-echo "\n";
-var_dump($_FILES['file']['tmp_name'][$i]);
-echo "\n";
-var_dump($_FILES['file']['error'][$i]);
-echo "\n";
-var_dump($_FILES['file']['size'][$i]);
-echo "</pre>\n";
-move_uploaded_file($_FILES['file']['tmp_name'][$i], getcwd().DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR.$_FILES['file']['name'][$i]); 
-@clearstatcache(); } 
-++$i; }
+$i = 0;
+$max = count($_FILES['file']['error']) - 1;
+while ($i <= $max) {
+    if ($_FILES['file']['error'][$i] === 0) {
+        echo "<hr />";
+        echo $_FILES['file']['tmp_name'][$i]." => ".getcwd().DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR.$_FILES['file']['name'][$i]."<br />\n";
+        echo "<a href=\"http://".$_SERVER['HTTP_HOST']."/~cooldude2k/minupload/uploads/".$_FILES['file']['name'][$i]."\" title=\"".$_FILES['file']['name'][$i]."\">http://".$_SERVER['HTTP_HOST']."/~cooldude2k/minupload/uploads/".$_FILES['file']['name'][$i]."</a><br />\n";
+        echo "\n<pre>";
+        var_dump($_FILES['file']['name'][$i]);
+        echo "\n";
+        var_dump($_FILES['file']['type'][$i]);
+        echo "\n";
+        var_dump($_FILES['file']['tmp_name'][$i]);
+        echo "\n";
+        var_dump($_FILES['file']['error'][$i]);
+        echo "\n";
+        var_dump($_FILES['file']['size'][$i]);
+        echo "</pre>\n";
+        move_uploaded_file($_FILES['file']['tmp_name'][$i], getcwd().DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR.$_FILES['file']['name'][$i]);
+        @clearstatcache();
+    }
+    ++$i;
+}
 chdir("./uploads/");
 var_dump(count(glob("*")));
-if(count(glob("*"))>0) { echo "\n<hr />\n"; }
+if (count(glob("*")) > 0) {
+    echo "\n<hr />\n";
+}
 echo "\n<pre>";
 foreach (glob("*") as $filename) {
-    echo "[<a href=\"http://".$_SERVER['HTTP_HOST']."/~cooldude2k/minupload/index.php?act=delete&amp;filename=".urlencode($filename)."\">Delete</a>] <a href=\"http://".$_SERVER['HTTP_HOST']."/~cooldude2k/minupload/uploads/".$filename."\" title=\"".$filename."\">".$filename."</a>\n"; 
-?>[<a href="javascript:<?php echo urlencode("alert('".gmdate("F d Y H:i:s", filectime($filename))."');"); ?>">INFO:CTIME</a>] <a href="javascript:<?php echo urlencode("alert('".gmdate("F d Y H:i:s", filectime($filename))."');"); ?>"><?php echo gmdate("F d Y H:i:s", filectime($filename)); ?></a><?php echo "\n";
-?>[<a href="javascript:<?php echo urlencode("alert('".gmdate("F d Y H:i:s", fileatime($filename))."');"); ?>">INFO:ATIME</a>] <a href="javascript:<?php echo urlencode("alert('".gmdate("F d Y H:i:s", fileatime($filename))."');"); ?>"><?php echo gmdate("F d Y H:i:s", fileatime($filename)); ?></a><?php echo "\n";
-?>[<a href="javascript:<?php echo urlencode("alert('".filesize($filename)." Bytes => "._format_bytes(filesize($filename))."');"); ?>">INFO:SIZE</a>] <a href="javascript:<?php echo urlencode("alert('".filesize($filename)." Bytes => "._format_bytes(filesize($filename))."');"); ?>"><?php echo filesize($filename)." Bytes =&gt; "._format_bytes(filesize($filename)); ?></a><?php echo "\n";
-if($_GET['act']=="debug"||$_GET['act']=="info") {
-?>[<a href="javascript:<?php echo urlencode("alert('".hash_file('crc32',$filename,FALSE)."');"); 
-?>">INFO:CRC</a>] <a href="javascript:<?php echo urlencode("alert('".hash_file('crc32',$filename,FALSE)."');"); ?>"><?php echo hash_file('crc32',$filename,FALSE); ?></a><?php echo "\n";
-?>[<a href="javascript:<?php echo urlencode("alert('".hash_file('crc32b',$filename,FALSE)."');"); ?>">INFO:CRCB</a>] <a href="javascript:<?php echo urlencode("alert('".hash_file('crc32b',$filename,FALSE)."');"); ?>"><?php echo hash_file('crc32b',$filename,FALSE); ?></a><?php echo "\n";
-?>[<a href="javascript:<?php echo urlencode("alert('".hash_file("md2", $filename)."');"); ?>">INFO:MD2</a>] <a href="javascript:<?php echo urlencode("alert('".hash_file("md2", $filename)."');"); ?>"><?php echo hash_file("md2", $filename); ?></a><?php echo "\n";
-?>[<a href="javascript:<?php echo urlencode("alert('".hash_file("md4", $filename)."');"); ?>">INFO:MD4</a>] <a href="javascript:<?php echo urlencode("alert('".hash_file("md4", $filename)."');"); ?>"><?php echo hash_file("md4", $filename); ?></a><?php echo "\n";
-?>[<a href="javascript:<?php echo urlencode("alert('".hash_file("md5", $filename)."');"); ?>">INFO:MD5</a>] <a href="javascript:<?php echo urlencode("alert('".hash_file("md5", $filename)."');"); ?>"><?php echo hash_file("md5", $filename); ?></a><?php echo "\n";
-?>[<a href="javascript:<?php echo urlencode("alert('".hash_file("sha1", $filename)."');"); ?>">INFO:SHA1</a>] <a href="javascript:<?php echo urlencode("alert('".hash_file("sha1", $filename)."');"); ?>"><?php echo hash_file("sha1", $filename); ?></a><?php echo "\n";
-?>[<a href="javascript:<?php echo urlencode("alert('".hash_file("sha224", $filename)."');"); ?>">INFO:SHA224</a>] <a href="javascript:<?php echo urlencode("alert('".hash_file("sha224", $filename)."');"); ?>"><?php echo hash_file("sha224", $filename); ?></a><?php echo "\n";
-?>[<a href="javascript:<?php echo urlencode("alert('".hash_file("sha256", $filename)."');"); ?>">INFO:SHA256</a>] <a href="javascript:<?php echo urlencode("alert('".hash_file("sha256", $filename)."');"); ?>"><?php echo hash_file("sha256", $filename); ?></a><?php echo "\n";
-?>[<a href="javascript:<?php echo urlencode("alert('".hash_file("sha384", $filename)."');"); ?>">INFO:SHA384</a>] <a href="javascript:<?php echo urlencode("alert('".hash_file("sha384", $filename)."');"); ?>"><?php echo hash_file("sha384", $filename); ?></a><?php echo "\n";
-?>[<a href="javascript:<?php echo urlencode("alert('".hash_file("sha512", $filename)."');"); ?>">INFO:SHA512</a>] <a href="javascript:<?php echo urlencode("alert('".hash_file("sha512", $filename)."');"); ?>"><?php echo hash_file("sha512", $filename); ?></a><?php } echo "\n<hr />\n"; ?>
+    echo "[<a href=\"http://".$_SERVER['HTTP_HOST']."/~cooldude2k/minupload/index.php?act=delete&amp;filename=".urlencode($filename)."\">Delete</a>] <a href=\"http://".$_SERVER['HTTP_HOST']."/~cooldude2k/minupload/uploads/".$filename."\" title=\"".$filename."\">".$filename."</a>\n";
+    ?>[<a href="javascript:<?php echo urlencode("alert('".gmdate("F d Y H:i:s", filectime($filename))."');"); ?>">INFO:CTIME</a>] <a href="javascript:<?php echo urlencode("alert('".gmdate("F d Y H:i:s", filectime($filename))."');"); ?>"><?php echo gmdate("F d Y H:i:s", filectime($filename)); ?></a><?php echo "\n";
+    ?>[<a href="javascript:<?php echo urlencode("alert('".gmdate("F d Y H:i:s", fileatime($filename))."');"); ?>">INFO:ATIME</a>] <a href="javascript:<?php echo urlencode("alert('".gmdate("F d Y H:i:s", fileatime($filename))."');"); ?>"><?php echo gmdate("F d Y H:i:s", fileatime($filename)); ?></a><?php echo "\n";
+    ?>[<a href="javascript:<?php echo urlencode("alert('".filesize($filename)." Bytes => "._format_bytes(filesize($filename))."');"); ?>">INFO:SIZE</a>] <a href="javascript:<?php echo urlencode("alert('".filesize($filename)." Bytes => "._format_bytes(filesize($filename))."');"); ?>"><?php echo filesize($filename)." Bytes =&gt; "._format_bytes(filesize($filename)); ?></a><?php echo "\n";
+    if ($_GET['act'] == "debug" || $_GET['act'] == "info") {
+        ?>[<a href="javascript:<?php echo urlencode("alert('".hash_file('crc32', $filename, false)."');");
+        ?>">INFO:CRC</a>] <a href="javascript:<?php echo urlencode("alert('".hash_file('crc32', $filename, false)."');"); ?>"><?php echo hash_file('crc32', $filename, false); ?></a><?php echo "\n";
+        ?>[<a href="javascript:<?php echo urlencode("alert('".hash_file('crc32b', $filename, false)."');"); ?>">INFO:CRCB</a>] <a href="javascript:<?php echo urlencode("alert('".hash_file('crc32b', $filename, false)."');"); ?>"><?php echo hash_file('crc32b', $filename, false); ?></a><?php echo "\n";
+        ?>[<a href="javascript:<?php echo urlencode("alert('".hash_file("md2", $filename)."');"); ?>">INFO:MD2</a>] <a href="javascript:<?php echo urlencode("alert('".hash_file("md2", $filename)."');"); ?>"><?php echo hash_file("md2", $filename); ?></a><?php echo "\n";
+        ?>[<a href="javascript:<?php echo urlencode("alert('".hash_file("md4", $filename)."');"); ?>">INFO:MD4</a>] <a href="javascript:<?php echo urlencode("alert('".hash_file("md4", $filename)."');"); ?>"><?php echo hash_file("md4", $filename); ?></a><?php echo "\n";
+        ?>[<a href="javascript:<?php echo urlencode("alert('".hash_file("md5", $filename)."');"); ?>">INFO:MD5</a>] <a href="javascript:<?php echo urlencode("alert('".hash_file("md5", $filename)."');"); ?>"><?php echo hash_file("md5", $filename); ?></a><?php echo "\n";
+        ?>[<a href="javascript:<?php echo urlencode("alert('".hash_file("sha1", $filename)."');"); ?>">INFO:SHA1</a>] <a href="javascript:<?php echo urlencode("alert('".hash_file("sha1", $filename)."');"); ?>"><?php echo hash_file("sha1", $filename); ?></a><?php echo "\n";
+        ?>[<a href="javascript:<?php echo urlencode("alert('".hash_file("sha224", $filename)."');"); ?>">INFO:SHA224</a>] <a href="javascript:<?php echo urlencode("alert('".hash_file("sha224", $filename)."');"); ?>"><?php echo hash_file("sha224", $filename); ?></a><?php echo "\n";
+        ?>[<a href="javascript:<?php echo urlencode("alert('".hash_file("sha256", $filename)."');"); ?>">INFO:SHA256</a>] <a href="javascript:<?php echo urlencode("alert('".hash_file("sha256", $filename)."');"); ?>"><?php echo hash_file("sha256", $filename); ?></a><?php echo "\n";
+        ?>[<a href="javascript:<?php echo urlencode("alert('".hash_file("sha384", $filename)."');"); ?>">INFO:SHA384</a>] <a href="javascript:<?php echo urlencode("alert('".hash_file("sha384", $filename)."');"); ?>"><?php echo hash_file("sha384", $filename); ?></a><?php echo "\n";
+        ?>[<a href="javascript:<?php echo urlencode("alert('".hash_file("sha512", $filename)."');"); ?>">INFO:SHA512</a>] <a href="javascript:<?php echo urlencode("alert('".hash_file("sha512", $filename)."');"); ?>"><?php echo hash_file("sha512", $filename); ?></a><?php } echo "\n<hr />\n"; ?>
 <?php }
 echo "</pre>\n";
 ?>
